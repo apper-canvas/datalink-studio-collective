@@ -1,0 +1,264 @@
+{
+  "tables": [
+    {
+      "name": "users",
+      "rowCount": 1247,
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "isPrimaryKey": true,
+          "isNullable": false
+        },
+        {
+          "name": "name",
+          "type": "varchar(255)",
+          "isPrimaryKey": false,
+          "isNullable": false
+        },
+        {
+          "name": "email", 
+          "type": "varchar(255)",
+          "isPrimaryKey": false,
+          "isNullable": false
+        },
+        {
+          "name": "email_verified_at",
+          "type": "timestamp",
+          "isPrimaryKey": false,
+          "isNullable": true
+        },
+        {
+          "name": "password",
+          "type": "varchar(255)",
+          "isPrimaryKey": false,
+          "isNullable": false
+        },
+        {
+          "name": "status",
+          "type": "varchar(50)",
+          "isPrimaryKey": false,
+          "isNullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp",
+          "isPrimaryKey": false,
+          "isNullable": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp",
+          "isPrimaryKey": false,
+          "isNullable": false
+        }
+      ]
+    },
+    {
+      "name": "products",
+      "rowCount": 543,
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "isPrimaryKey": true,
+          "isNullable": false
+        },
+        {
+          "name": "name",
+          "type": "varchar(255)",
+          "isPrimaryKey": false,
+          "isNullable": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "isPrimaryKey": false,
+          "isNullable": true
+        },
+        {
+          "name": "price",
+          "type": "decimal(10,2)",
+          "isPrimaryKey": false,
+          "isNullable": false
+        },
+        {
+          "name": "category",
+          "type": "varchar(100)",
+          "isPrimaryKey": false,
+          "isNullable": false
+        },
+        {
+          "name": "stock_quantity",
+          "type": "integer",
+          "isPrimaryKey": false,
+          "isNullable": false
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "isPrimaryKey": false,
+          "isNullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp",
+          "isPrimaryKey": false,
+          "isNullable": false
+        }
+      ]
+    },
+    {
+      "name": "orders",
+      "rowCount": 2891,
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "isPrimaryKey": true,
+          "isNullable": false
+        },
+        {
+          "name": "user_id",
+          "type": "bigint",
+          "isPrimaryKey": false,
+          "isNullable": false
+        },
+        {
+          "name": "order_number",
+          "type": "varchar(100)",
+          "isPrimaryKey": false,
+          "isNullable": false
+        },
+        {
+          "name": "total_amount",
+          "type": "decimal(12,2)",
+          "isPrimaryKey": false,
+          "isNullable": false
+        },
+        {
+          "name": "status",
+          "type": "varchar(50)",
+          "isPrimaryKey": false,
+          "isNullable": false
+        },
+        {
+          "name": "payment_method",
+          "type": "varchar(50)",
+          "isPrimaryKey": false,
+          "isNullable": true
+        },
+        {
+          "name": "shipped_at",
+          "type": "timestamp",
+          "isPrimaryKey": false,
+          "isNullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp",
+          "isPrimaryKey": false,
+          "isNullable": false
+        }
+      ]
+    },
+    {
+      "name": "order_items",
+      "rowCount": 7234,
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "isPrimaryKey": true,
+          "isNullable": false
+        },
+        {
+          "name": "order_id",
+          "type": "bigint",
+          "isPrimaryKey": false,
+          "isNullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "bigint",
+          "isPrimaryKey": false,
+          "isNullable": false
+        },
+        {
+          "name": "quantity",
+          "type": "integer",
+          "isPrimaryKey": false,
+          "isNullable": false
+        },
+        {
+          "name": "unit_price",
+          "type": "decimal(10,2)",
+          "isPrimaryKey": false,
+          "isNullable": false
+        },
+        {
+          "name": "total_price",
+          "type": "decimal(12,2)",
+          "isPrimaryKey": false,
+          "isNullable": false
+        }
+      ]
+    },
+    {
+      "name": "categories",
+      "rowCount": 15,
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "isPrimaryKey": true,
+          "isNullable": false
+        },
+        {
+          "name": "name",
+          "type": "varchar(100)",
+          "isPrimaryKey": false,
+          "isNullable": false
+        },
+        {
+          "name": "slug",
+          "type": "varchar(100)",
+          "isPrimaryKey": false,
+          "isNullable": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "isPrimaryKey": false,
+          "isNullable": true
+        },
+        {
+          "name": "is_featured",
+          "type": "boolean",
+          "isPrimaryKey": false,
+          "isNullable": false
+        }
+      ]
+    }
+  ],
+  "views": [
+    {
+      "name": "user_order_summary",
+      "definition": "SELECT u.id, u.name, u.email, COUNT(o.id) as order_count, SUM(o.total_amount) as total_spent FROM users u LEFT JOIN orders o ON u.id = o.user_id GROUP BY u.id, u.name, u.email"
+    },
+    {
+      "name": "product_sales_stats", 
+      "definition": "SELECT p.id, p.name, p.category, COUNT(oi.id) as times_ordered, SUM(oi.quantity) as total_sold FROM products p LEFT JOIN order_items oi ON p.id = oi.product_id GROUP BY p.id, p.name, p.category"
+    }
+  ],
+  "procedures": [
+    {
+      "name": "update_product_stock",
+      "parameters": ["product_id bigint", "quantity_change integer"]
+    },
+    {
+      "name": "calculate_monthly_revenue",
+      "parameters": ["start_date date", "end_date date"]
+    }
+  ]
+}

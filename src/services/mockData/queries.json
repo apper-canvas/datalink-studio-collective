@@ -1,0 +1,42 @@
+[
+  {
+    "id": "1",
+    "connectionId": "1",
+    "sql": "SELECT * FROM users WHERE status = 'active' ORDER BY created_at DESC LIMIT 10",
+    "executedAt": "2024-01-20T10:45:00Z",
+    "executionTime": 127,
+    "rowCount": 10
+  },
+  {
+    "id": "2",
+    "connectionId": "1", 
+    "sql": "SELECT COUNT(*) as total_users FROM users",
+    "executedAt": "2024-01-20T10:30:00Z",
+    "executionTime": 45,
+    "rowCount": 1
+  },
+  {
+    "id": "3",
+    "connectionId": "2",
+    "sql": "UPDATE products SET price = price * 1.1 WHERE category = 'electronics'",
+    "executedAt": "2024-01-19T16:20:00Z", 
+    "executionTime": 203,
+    "rowCount": 25
+  },
+  {
+    "id": "4",
+    "connectionId": "3",
+    "sql": "SELECT date_trunc('month', created_at) as month, COUNT(*) as orders FROM orders GROUP BY month ORDER BY month DESC",
+    "executedAt": "2024-01-19T14:15:00Z",
+    "executionTime": 89,
+    "rowCount": 12
+  },
+  {
+    "id": "5",
+    "connectionId": "1",
+    "sql": "SELECT u.name, u.email, COUNT(o.id) as order_count FROM users u LEFT JOIN orders o ON u.id = o.user_id GROUP BY u.id, u.name, u.email HAVING COUNT(o.id) > 5",
+    "executedAt": "2024-01-18T11:30:00Z",
+    "executionTime": 156,
+    "rowCount": 8
+  }
+]

@@ -1,0 +1,46 @@
+[
+  {
+    "id": "1",
+    "name": "Production Database",
+    "type": "postgresql",
+    "host": "prod-db.company.com",
+    "port": 5432,
+    "database": "app_production",
+    "username": "app_user",
+    "isActive": true,
+    "lastConnected": "2024-01-20T10:30:00Z"
+  },
+  {
+    "id": "2", 
+    "name": "Development DB",
+    "type": "mysql",
+    "host": "localhost",
+    "port": 3306,
+    "database": "app_development",
+    "username": "dev_user",
+    "isActive": false,
+    "lastConnected": "2024-01-19T14:22:00Z"
+  },
+  {
+    "id": "3",
+    "name": "Analytics Warehouse",
+    "type": "postgresql", 
+    "host": "analytics.company.com",
+    "port": 5432,
+    "database": "data_warehouse",
+    "username": "analyst",
+    "isActive": false,
+    "lastConnected": "2024-01-18T09:15:00Z"
+  },
+  {
+    "id": "4",
+    "name": "Local SQLite",
+    "type": "sqlite",
+    "host": "",
+    "port": null,
+    "database": "local_data.db", 
+    "username": "",
+    "isActive": false,
+    "lastConnected": null
+  }
+]
