@@ -1,12 +1,12 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import Layout from './Layout';
-import Home from './pages/Home';
-import Connections from './pages/Connections';
-import QueryEditor from './pages/QueryEditor';
-import SchemaExplorer from './pages/SchemaExplorer';
-import Settings from './pages/Settings';
-import NotFound from './pages/NotFound';
+import HomePage from '@/components/pages/HomePage';
+import ConnectionsPage from '@/components/pages/ConnectionsPage';
+import QueryEditorPage from '@/components/pages/QueryEditorPage';
+import SchemaExplorerPage from '@/components/pages/SchemaExplorerPage';
+import SettingsPage from '@/components/pages/SettingsPage';
+import NotFoundPage from '@/components/pages/NotFoundPage';
 import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
@@ -14,12 +14,12 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="/connections" element={<Connections />} />
-          <Route path="/query-editor" element={<QueryEditor />} />
-          <Route path="/schema-explorer" element={<SchemaExplorer />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="*" element={<NotFound />} />
+<Route index element={<HomePage />} />
+          <Route path="/connections" element={<ConnectionsPage />} />
+          <Route path="/query-editor" element={<QueryEditorPage />} />
+          <Route path="/schema-explorer" element={<SchemaExplorerPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
       <ToastContainer

@@ -1,11 +1,17 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import ApperIcon from '../components/ApperIcon';
-import connectionService from '../services/api/connectionService';
-import schemaService from '../services/api/schemaService';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import ApperIcon from '@/components/ApperIcon';
+import Spinner from '@/components/atoms/Spinner';
+import Heading from '@/components/atoms/Heading';
+import Paragraph from '@/components/atoms/Paragraph';
+import LinkButton from '@/components/atoms/LinkButton';
+import Card from '@/components/molecules/Card';
+import EmptyState from '@/components/molecules/EmptyState';
+import connectionService from '@/services/api/connectionService';
+import schemaService from '@/services/api/schemaService';
 import { toast } from 'react-toastify';
 
-function SchemaExplorer() {
+const SchemaExplorerTree = () => {
   const [activeConnection, setActiveConnection] = useState(null);
   const [schema, setSchema] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -46,13 +52,15 @@ function SchemaExplorer() {
   };
 
   const toggleTable = (tableName) => {
-    const newExpanded = new Set(expandedTables);
-    if (newExpanded.has(tableName)) {
-      newExpanded.delete(tableName);
-    } else {
-      newExpanded.add(tableName);
-    }
-    setExpandedTables(newExpanded);
+    setExpandedTables(prev => {
+      const newExpanded = new Set(prev);
+      if (newExpanded.has(tableName)) {
+        newExpanded.delete(tableName);
+      } else {
+        newExpanded.add(tableName);
+      }
+      return newExpanded;
+    });
   };
 
   const getTypeIcon = (dataType) => {
@@ -76,21 +84,20 @@ function SchemaExplorer() {
       <div className="p-6">
         <div className="space-y-4">
           {[...Array(5)].map((_, i) => (
-            <motion.div
+            <Card
               key={i}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              animated
               transition={{ delay: i * 0.1 }}
-              className="bg-white rounded-lg p-4 shadow-sm border border-surface-200"
+              className="p-4 shadow-sm animate-pulse"
             >
-              <div className="animate-pulse space-y-3">
+              <div className="space-y-3">
                 <div className="h-4 bg-surface-200 rounded w-1/4"></div>
                 <div className="space-y-2 ml-4">
                   <div className="h-3 bg-surface-200 rounded w-3/4"></div>
                   <div className="h-3 bg-surface-200 rounded w-1/2"></div>
                 </div>
               </div>
-            </motion.div>
+            </Card>
           ))}
         </div>
       </div>
@@ -100,19 +107,14 @@ function SchemaExplorer() {
   if (error) {
     return (
       <div className="p-6">
-        <div className="text-center py-12">
-          <ApperIcon name="AlertCircle" className="w-12 h-12 text-error mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-surface-900 mb-2">Failed to load schema</h3>
-          <p className="text-surface-600 mb-4">{error}</p>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={loadActiveConnection}
-            className="px-4 py-2 bg-primary text-white rounded-lg hover:brightness-110 transition-all"
-          >
-            Try Again
-          </motion.button>
-        </div>
+        <EmptyState
+          iconName="AlertCircle"
+          title="Failed to load schema"
+          message={error}
+          buttonText="Try Again"
+          onButtonClick={loadActiveConnection}
+          buttonIcon="RefreshCw"
+        />
       </div>
     );
   }
@@ -120,19 +122,13 @@ function SchemaExplorer() {
   if (!activeConnection) {
     return (
       <div className="p-6">
-        <div className="text-center py-12">
-          <ApperIcon name="Database" className="w-12 h-12 text-surface-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-surface-900 mb-2">No Active Connection</h3>
-          <p className="text-surface-600 mb-4">Please connect to a database to explore its schema</p>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => window.location.href = '/connections'}
-            className="px-4 py-2 bg-primary text-white rounded-lg hover:brightness-110 transition-all"
-          >
-            Manage Connections
-          </motion.button>
-        </div>
+        <EmptyState
+          iconName="Database"
+          title="No Active Connection"
+          message="Please connect to a database to explore its schema"
+          buttonText="Manage Connections"
+          onButtonClick={() => window.location.href = '/connections'}
+        />
       </div>
     );
   }
@@ -143,21 +139,21 @@ function SchemaExplorer() {
       <div className="flex-shrink-0 border-b border-surface-200 bg-white p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-surface-900 mb-2">Schema Explorer</h1>
+            <Heading level={2} className="text-2xl font-semibold text-surface-900 mb-2">Schema Explorer</Heading>
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 rounded-full bg-success"></div>
               <span className="text-surface-600">{activeConnection.name} ({activeConnection.database})</span>
             </div>
           </div>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+          <LinkButton
             onClick={() => loadSchema(activeConnection.id)}
             className="flex items-center space-x-2 px-4 py-2 border border-surface-300 rounded-lg hover:bg-surface-50 transition-colors"
+            icon={<ApperIcon name="RefreshCw" size={16} />}
+            variant="outline"
+            animated
           >
-            <ApperIcon name="RefreshCw" size={16} />
-            <span>Refresh</span>
-          </motion.button>
+            Refresh
+          </LinkButton>
         </div>
       </div>
 
@@ -168,18 +164,17 @@ function SchemaExplorer() {
             {/* Tables */}
             {schema.tables && schema.tables.length > 0 && (
               <div>
-                <h2 className="text-lg font-medium text-surface-900 mb-4 flex items-center">
+                <Heading level={3} className="text-lg font-medium text-surface-900 mb-4 flex items-center">
                   <ApperIcon name="Table" className="w-5 h-5 mr-2" />
                   Tables ({schema.tables.length})
-                </h2>
+                </Heading>
                 <div className="space-y-2">
                   {schema.tables.map((table, index) => (
-                    <motion.div
+                    <Card
                       key={table.name}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
+                      animated
                       transition={{ delay: index * 0.05 }}
-                      className="bg-white border border-surface-200 rounded-lg overflow-hidden"
+                      className="rounded-lg overflow-hidden border border-surface-200"
                     >
                       <motion.div
                         whileHover={{ backgroundColor: '#f8fafc' }}
@@ -245,7 +240,7 @@ function SchemaExplorer() {
                           </motion.div>
                         )}
                       </AnimatePresence>
-                    </motion.div>
+                    </Card>
                   ))}
                 </div>
               </div>
@@ -254,24 +249,23 @@ function SchemaExplorer() {
             {/* Views */}
             {schema.views && schema.views.length > 0 && (
               <div>
-                <h2 className="text-lg font-medium text-surface-900 mb-4 flex items-center">
+                <Heading level={3} className="text-lg font-medium text-surface-900 mb-4 flex items-center">
                   <ApperIcon name="Eye" className="w-5 h-5 mr-2" />
                   Views ({schema.views.length})
-                </h2>
+                </Heading>
                 <div className="space-y-2">
                   {schema.views.map((view, index) => (
-                    <motion.div
+                    <Card
                       key={view.name}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
+                      animated
                       transition={{ delay: index * 0.05 }}
-                      className="bg-white border border-surface-200 rounded-lg p-4"
+                      className="p-4 border border-surface-200"
                     >
                       <div className="flex items-center space-x-3">
                         <ApperIcon name="Eye" size={18} className="text-accent" />
                         <span className="font-medium text-surface-900">{view.name}</span>
                       </div>
-                    </motion.div>
+                    </Card>
                   ))}
                 </div>
               </div>
@@ -280,24 +274,23 @@ function SchemaExplorer() {
             {/* Procedures */}
             {schema.procedures && schema.procedures.length > 0 && (
               <div>
-                <h2 className="text-lg font-medium text-surface-900 mb-4 flex items-center">
+                <Heading level={3} className="text-lg font-medium text-surface-900 mb-4 flex items-center">
                   <ApperIcon name="Zap" className="w-5 h-5 mr-2" />
                   Procedures ({schema.procedures.length})
-                </h2>
+                </Heading>
                 <div className="space-y-2">
                   {schema.procedures.map((procedure, index) => (
-                    <motion.div
+                    <Card
                       key={procedure.name}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
+                      animated
                       transition={{ delay: index * 0.05 }}
-                      className="bg-white border border-surface-200 rounded-lg p-4"
+                      className="p-4 border border-surface-200"
                     >
                       <div className="flex items-center space-x-3">
                         <ApperIcon name="Zap" size={18} className="text-warning" />
                         <span className="font-medium text-surface-900">{procedure.name}</span>
                       </div>
-                    </motion.div>
+                    </Card>
                   ))}
                 </div>
               </div>
@@ -306,22 +299,22 @@ function SchemaExplorer() {
             {(!schema.tables || schema.tables.length === 0) && 
              (!schema.views || schema.views.length === 0) && 
              (!schema.procedures || schema.procedures.length === 0) && (
-              <div className="text-center py-12">
-                <ApperIcon name="Database" className="w-12 h-12 text-surface-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-surface-900 mb-2">No Schema Found</h3>
-                <p className="text-surface-600">The database appears to be empty or the schema could not be loaded</p>
-              </div>
+              <EmptyState
+                iconName="Database"
+                title="No Schema Found"
+                message="The database appears to be empty or the schema could not be loaded"
+              />
             )}
           </div>
         ) : (
           <div className="text-center py-12">
-            <ApperIcon name="Loader2" className="w-8 h-8 animate-spin text-primary mx-auto mb-4" />
-            <p className="text-surface-600">Loading schema...</p>
+            <Spinner className="w-8 h-8 text-primary mx-auto mb-4" />
+            <Paragraph className="text-surface-600">Loading schema...</Paragraph>
           </div>
         )}
       </div>
     </div>
   );
-}
+};
 
-export default SchemaExplorer;
+export default SchemaExplorerTree;

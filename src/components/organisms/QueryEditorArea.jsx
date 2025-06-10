@@ -1,11 +1,14 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import ApperIcon from './ApperIcon';
-import connectionService from '../services/api/connectionService';
-import queryService from '../services/api/queryService';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import ApperIcon from '@/components/ApperIcon';
+import Button from '@/components/atoms/Button';
+import Spinner from '@/components/atoms/Spinner';
+import DataTable from '@/components/molecules/DataTable';
+import connectionService from '@/services/api/connectionService';
+import queryService from '@/services/api/queryService';
+import Heading from '@/components/atoms/Heading';
 
-function MainFeature() {
+const QueryEditorArea = () => {
   const [activeConnection, setActiveConnection] = useState(null);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState(null);
@@ -64,7 +67,6 @@ function MainFeature() {
   };
 
   const formatSQL = () => {
-    // Basic SQL formatting
     const formatted = query
       .replace(/\bSELECT\b/gi, 'SELECT')
       .replace(/\bFROM\b/gi, '\nFROM')
@@ -77,20 +79,23 @@ function MainFeature() {
     toast.success('Query formatted');
   };
 
-  const applySyntaxHighlighting = (text) => {
-    return text
-      .replace(/\b(SELECT|FROM|WHERE|ORDER BY|GROUP BY|HAVING|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP)\b/gi, 
-               '<span class="sql-keyword">$1</span>')
-      .replace(/'([^']*)'/g, '<span class="sql-string">\'$1\'</span>')
-      .replace(/\b(\d+)\b/g, '<span class="sql-number">$1</span>')
-      .replace(/--([^\n]*)/g, '<span class="sql-comment">--$1</span>');
-  };
+  // applySyntaxHighlighting is not used in the original `MainFeature.jsx` for the textarea value
+  // and would typically require a proper code editor component, not a simple textarea.
+  // Keeping this function for completeness if it were to be used with a rich text editor.
+  // const applySyntaxHighlighting = (text) => {
+  //   return text
+  //     .replace(/\b(SELECT|FROM|WHERE|ORDER BY|GROUP BY|HAVING|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP)\b/gi, 
+  //              '<span class="sql-keyword">$1</span>')
+  //     .replace(/'([^']*)'/g, '<span class="sql-string">\'$1\'</span>')
+  //     .replace(/\b(\d+)\b/g, '<span class="sql-number">$1</span>')
+  //     .replace(/--([^\n]*)/g, '<span class="sql-comment">--$1</span>');
+  // };
 
   if (loading) {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center">
-          <ApperIcon name="Loader2" className="w-8 h-8 animate-spin text-primary mx-auto mb-4" />
+          <Spinner size={24} className="mx-auto mb-4" />
           <p className="text-surface-600">Loading workspace...</p>
         </div>
       </div>
@@ -103,7 +108,7 @@ function MainFeature() {
       <div className="flex-shrink-0 border-b border-surface-200 bg-white p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <h2 className="text-lg font-semibold text-surface-900">Query Editor</h2>
+            <Heading level={2} className="text-lg font-semibold text-surface-900 mb-0">Query Editor</Heading>
             {activeConnection && (
               <div className="flex items-center space-x-2 px-3 py-1 bg-surface text-sm rounded-lg">
                 <div className="w-2 h-2 rounded-full bg-success"></div>
@@ -112,25 +117,27 @@ function MainFeature() {
             )}
           </div>
           <div className="flex items-center space-x-2">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <Button
               onClick={formatSQL}
-              className="px-3 py-2 text-sm border border-surface-300 rounded-lg hover:bg-surface-50 transition-colors"
+              variant="outline"
+              animated
+              motionProps={{ whileHover: { scale: 1.05 }, whileTap: { scale: 0.95 } }}
+              className="px-3 py-2 text-sm flex items-center"
             >
               <ApperIcon name="Code" size={16} className="mr-2" />
               Format
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            </Button>
+            <Button
               onClick={executeQuery}
               disabled={executing || !activeConnection}
-              className="px-4 py-2 bg-primary text-white text-sm rounded-lg hover:brightness-110 disabled:opacity-50 transition-all"
+              variant="primary"
+              animated
+              motionProps={{ whileHover: { scale: 1.05 }, whileTap: { scale: 0.95 } }}
+              className="px-4 py-2 text-sm flex items-center"
             >
               {executing ? (
                 <>
-                  <ApperIcon name="Loader2" size={16} className="mr-2 animate-spin" />
+                  <Spinner size={16} className="mr-2" />
                   Executing...
                 </>
               ) : (
@@ -139,7 +146,7 @@ function MainFeature() {
                   Execute
                 </>
               )}
-            </motion.button>
+            </Button>
           </div>
         </div>
       </div>
@@ -172,48 +179,7 @@ function MainFeature() {
               </div>
               
               <div className="flex-1 overflow-auto p-4">
-                {results.data && results.data.length > 0 ? (
-                  <div className="border border-surface-200 rounded-lg overflow-hidden">
-                    <table className="w-full">
-                      <thead className="bg-surface">
-                        <tr>
-                          {Object.keys(results.data[0]).map((column) => (
-                            <th
-                              key={column}
-                              className="px-4 py-3 text-left text-sm font-medium text-surface-700 border-b border-surface-200"
-                            >
-                              {column}
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {results.data.map((row, index) => (
-                          <tr
-                            key={index}
-                            className="hover:bg-surface-50 transition-colors"
-                          >
-                            {Object.values(row).map((value, cellIndex) => (
-                              <td
-                                key={cellIndex}
-                                className="px-4 py-3 text-sm text-surface-900 border-b border-surface-100 font-mono"
-                              >
-                                {value !== null ? String(value) : (
-                                  <span className="text-surface-400 italic">NULL</span>
-                                )}
-                              </td>
-                            ))}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <ApperIcon name="Table" className="w-12 h-12 text-surface-300 mx-auto mb-4" />
-                    <p className="text-surface-500">No results to display</p>
-                  </div>
-                )}
+                <DataTable data={results.data} />
               </div>
             </div>
           </div>
@@ -221,6 +187,6 @@ function MainFeature() {
       </div>
     </div>
   );
-}
+};
 
-export default MainFeature;
+export default QueryEditorArea;

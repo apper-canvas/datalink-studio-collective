@@ -1,8 +1,9 @@
-import Home from '../pages/Home';
-import Connections from '../pages/Connections';
-import QueryEditor from '../pages/QueryEditor';
-import SchemaExplorer from '../pages/SchemaExplorer';
-import Settings from '../pages/Settings';
+import HomePage from '@/components/pages/HomePage';
+import ConnectionsPage from '@/components/pages/ConnectionsPage';
+import QueryEditorPage from '@/components/pages/QueryEditorPage';
+import SchemaExplorerPage from '@/components/pages/SchemaExplorerPage';
+import SettingsPage from '@/components/pages/SettingsPage';
+import NotFoundPage from '@/components/pages/NotFoundPage';
 
 export const routes = {
   home: {
@@ -10,35 +11,35 @@ export const routes = {
     label: 'Dashboard',
     path: '/',
     icon: 'LayoutDashboard',
-    component: Home
+component: HomePage
   },
   connections: {
     id: 'connections',
     label: 'Connections',
     path: '/connections',
     icon: 'Database',
-    component: Connections
+component: ConnectionsPage
   },
   queryEditor: {
     id: 'queryEditor',
     label: 'Query Editor',
     path: '/query-editor',
     icon: 'Code2',
-    component: QueryEditor
+component: QueryEditorPage
   },
   schemaExplorer: {
     id: 'schemaExplorer',
     label: 'Schema Explorer',
     path: '/schema-explorer',
     icon: 'FolderTree',
-    component: SchemaExplorer
+component: SchemaExplorerPage
   },
   settings: {
     id: 'settings',
     label: 'Settings',
     path: '/settings',
     icon: 'Settings',
-    component: Settings
+component: SettingsPage
   }
 };
 
